@@ -26,7 +26,11 @@
 		]
 	},
 	"mixins": [
-		"pingtabmod.mixins.json"
+		"pingtabmod.mixins.json",
+		{
+			"config": "pingtabmod.client.mixins.json",
+			"environment": "client"
+		}
 	],
 	"accessWidener": "pingtabmod.accesswidener",
 
