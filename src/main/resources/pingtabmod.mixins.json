@@ -1,0 +1,12 @@
+{
+	"required": true,
+	"package": "net.natxo.pingtabmod.mixin",
+	"compatibilityLevel": "JAVA_17",
+	"mixins": [
+		"ExampleMixin",
+		"PlayerListHudMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}

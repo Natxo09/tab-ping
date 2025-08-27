@@ -1,0 +1,42 @@
+{
+	"schemaVersion": 1,
+	"id": "pingtabmod",
+	"version": "${version}",
+	"name": "PingTabMod",
+	"description": "A mod that shows player ping in the tab list",
+	"authors": [
+		"Natxo!"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/tab-ping",
+		"issues": "https://github.com/Natxo09/Fabric-Mods/issues"
+	},
+	"license": "MIT",
+	"icon": "assets/pingtabmod/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"net.natxo.pingtabmod.PingTabMod"
+		],
+		"client": [
+			"net.natxo.pingtabmod.PingTabModClient"
+		],
+		"fabric-datagen": [
+			"net.natxo.pingtabmod.PingTabModDataGenerator"
+		]
+	},
+	"mixins": [
+		"pingtabmod.mixins.json"
+	],
+	"accessWidener": "pingtabmod.accesswidener",
+
+	"depends": {
+		"fabricloader": ">=0.15.11",
+		"minecraft": ">=1.20.4",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
