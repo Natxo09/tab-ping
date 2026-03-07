@@ -1,6 +1,7 @@
 plugins {
-	id 'fabric-loom' version '1.6-SNAPSHOT'
+	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
 	id 'maven-publish'
+	id 'com.modrinth.minotaur' version '2.+'
 }
 
 version = project.mod_version
@@ -11,26 +12,13 @@ base {
 }
 
 repositories {
-	// Add repositories to retrieve artifacts from in here.
-	// You should only use this when depending on other mods because
-	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
-	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
-	// for more information about repositories.
-}
-
-fabricApi {
-	configureDataGeneration()
 }
 
 dependencies {
-	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+	mappings loom.officialMojangMappings()
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 }
 
 loom {
@@ -41,27 +29,57 @@ processResources {
 	inputs.property "version", project.version
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand "version": inputs.properties.version
 	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 17
+	it.options.release = 21
 }
 
 java {
-	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-	// if it is present.
-	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 }
 
 jar {
+	inputs.property "archivesName", project.base.archivesName
+
 	from("LICENSE") {
-		rename { "${it}_${project.base.archivesName.get()}"}
+		rename { "${it}_${inputs.properties.archivesName}"}
+	}
+}
+
+// load .env file if present
+file('.env').with { envFile ->
+	if (envFile.exists()) {
+		envFile.eachLine { line ->
+			def trimmed = line.trim()
+			if (trimmed && !trimmed.startsWith('#') && trimmed.contains('=')) {
+				def (key, value) = trimmed.split('=', 2)
+				if (System.getenv(key) == null && value) {
+					System.setProperty(key, value)
+				}
+			}
+		}
+	}
+}
+
+// configure modrinth publishing
+modrinth {
+	token = System.getenv("MODRINTH_TOKEN") ?: System.getProperty("MODRINTH_TOKEN")
+	projectId = "2Galpqy2"
+	versionNumber = project.mod_version
+	versionType = "release"
+	uploadFile = remapJar
+	gameVersions = [project.minecraft_version]
+	loaders = ["fabric"]
+	changelog = System.getenv("CHANGELOG") ?: ""
+
+	dependencies {
+		required.project "fabric-api"
 	}
 }
 
@@ -74,11 +92,6 @@ publishing {
 		}
 	}
 
-	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
-		// Add repositories to publish to here.
-		// Notice: This block does NOT have the same function as the block in the top level.
-		// The repositories here will be used for publishing your artifact, not for
-		// retrieving dependencies.
 	}
 }

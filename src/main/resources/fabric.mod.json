@@ -3,44 +3,37 @@
 	"id": "pingtabmod",
 	"version": "${version}",
 	"name": "PingTabMod",
-	"description": "A mod that shows player ping in the tab list",
+	"description": "A mod that shows player ping as numbers in the tab list",
 	"authors": [
-		"Natxo!"
+		"Natxo"
 	],
 	"contact": {
 		"homepage": "https://modrinth.com/mod/tab-ping",
-		"issues": "https://github.com/Natxo09/Fabric-Mods/issues"
+		"sources": "https://github.com/Natxo09/tab-ping",
+		"issues": "https://github.com/Natxo09/tab-ping/issues"
 	},
 	"license": "MIT",
 	"icon": "assets/pingtabmod/icon.png",
-	"environment": "*",
+	"environment": "client",
 	"entrypoints": {
 		"main": [
 			"net.natxo.pingtabmod.PingTabMod"
 		],
 		"client": [
 			"net.natxo.pingtabmod.PingTabModClient"
-		],
-		"fabric-datagen": [
-			"net.natxo.pingtabmod.PingTabModDataGenerator"
 		]
 	},
 	"mixins": [
-		"pingtabmod.mixins.json",
 		{
 			"config": "pingtabmod.client.mixins.json",
 			"environment": "client"
 		}
 	],
 	"accessWidener": "pingtabmod.accesswidener",
-
 	"depends": {
-		"fabricloader": ">=0.15.11",
-		"minecraft": ">=1.20.4",
-		"java": ">=17",
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~1.21.10",
+		"java": ">=21",
 		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
 	}
 }
