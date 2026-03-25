@@ -2,7 +2,7 @@ package net.natxo.pingtabmod.mixin;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.PlayerTabOverlay;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class PlayerListHudMixin {
 
     @ModifyArg(
-        method = "render",
+        method = "extractRenderState",
         at = @At(value = "INVOKE", target = "Ljava/lang/Math;min(II)I", ordinal = 0),
         index = 0
     )
@@ -23,8 +23,8 @@ public class PlayerListHudMixin {
         return originalWidth + 30;
     }
 
-    @Inject(method = "renderPingIcon", at = @At("HEAD"), cancellable = true)
-    protected void renderPingAsNumber(GuiGraphics context, int width, int x, int y, PlayerInfo entry, CallbackInfo ci) {
+    @Inject(method = "extractPingIcon", at = @At("HEAD"), cancellable = true)
+    protected void renderPingAsNumber(GuiGraphicsExtractor context, int width, int x, int y, PlayerInfo entry, CallbackInfo ci) {
         ci.cancel();
 
         Minecraft client = Minecraft.getInstance();
@@ -51,6 +51,6 @@ public class PlayerListHudMixin {
         int textWidth = font.width(pingText);
         int pingX = x + width - textWidth - 2;
 
-        context.drawString(font, pingText, pingX, y, color, false);
+        context.text(font, pingText, pingX, y, color, false);
     }
 }

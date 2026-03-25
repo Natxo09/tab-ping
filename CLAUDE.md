@@ -13,12 +13,12 @@ Client-side Fabric mod that replaces the vanilla ping bars in the player tab lis
 
 | Component       | Version                    |
 |-----------------|----------------------------|
-| Minecraft       | 1.21.1                     |
-| Fabric Loader   | 0.15.11                    |
-| Fabric Loom     | 1.6-SNAPSHOT               |
-| Fabric API      | 0.102.1+1.21.1             |
-| Java            | 17                         |
-| Mappings        | Yarn                       |
+| Minecraft       | 26.1                       |
+| Fabric Loader   | 0.18.4                     |
+| Fabric Loom     | 1.15-SNAPSHOT              |
+| Fabric API      | 0.144.0+26.1               |
+| Java            | 25                         |
+| Mappings        | Mojang (official)          |
 
 ## Project Structure
 
@@ -27,15 +27,13 @@ src/main/java/net/natxo/pingtabmod/
 ├── PingTabMod.java              # Server entrypoint (ModInitializer, minimal)
 ├── PingTabModClient.java        # Client entrypoint (dev commands)
 ├── DevPingManager.java          # Dev-only ping simulation utility
-├── PingTabModDataGenerator.java # Data generator (empty placeholder)
 └── mixin/
     └── PlayerListHudMixin.java  # Core: replaces ping bars with numbers
 
 src/main/resources/
 ├── fabric.mod.json
-├── pingtabmod.mixins.json         # Server-side mixins (empty)
 ├── pingtabmod.client.mixins.json  # Client-side mixins (PlayerListHudMixin)
-├── pingtabmod.accesswidener       # Makes PlayerListHud extendable
+├── pingtabmod.accesswidener       # Makes PlayerTabOverlay extendable
 └── assets/pingtabmod/icon.png
 ```
 
@@ -64,16 +62,16 @@ javap -p -classpath <jar-path> <ClassName> 2>&1 | grep -i "methodName"
 ## How It Works
 
 1. **PlayerListHudMixin** intercepts the vanilla tab list rendering:
-   - `increaseEntryWidth()` — adds 30px extra width via `@ModifyArg` on `Math.min` in render()
-   - `renderPingAsNumber()` — cancels `renderLatencyIcon` and draws numeric ping instead
+   - `increaseEntryWidth()` — adds 30px extra width via `@ModifyArg` on `Math.min` in extractRenderState()
+   - `renderPingAsNumber()` — cancels `extractPingIcon` and draws numeric ping instead
 2. **Color coding:** Green (<150ms), Yellow (<300ms), Light red (<600ms), Dark red (>=600ms)
 3. **Dev mode:** `/devping <ms>` and `/devping off` commands (only in dev environment)
 
 ## Key Mixin Target
 
-The critical mixin target is `PlayerListHud`:
-- `render()` method — for width modification
-- `renderLatencyIcon()` method — for replacing ping bars with numbers
+The critical mixin target is `PlayerTabOverlay`:
+- `extractRenderState()` method — for width modification
+- `extractPingIcon()` method — for replacing ping bars with numbers
 
 When updating MC versions, these methods MUST be verified with `javap` as they are the most likely to change signatures.
 
